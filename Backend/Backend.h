@@ -8,11 +8,12 @@
 #include "AppManagement/AppManagement.h"
 #include <map>
 #include <ctime>
+#include "AppManagement/StructAppInfo.h"
 
 class Backend {
     public:
         static Backend& getInstance();
-        std::map<char[], time_t> getOpenedWindows();
+        std::map<char*, StructAppInfo> getOpenedWindows();
 
     private:
         Backend& operator= (const Backend&);
@@ -21,7 +22,7 @@ class Backend {
         Backend();
         ~Backend();
 
-        std::map<char[], time_t> openedWindows;
+        std::map<char*, StructAppInfo> openedWindows;
     friend class AppManagement;
 };
 

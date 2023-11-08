@@ -6,6 +6,9 @@
 #include "../Backend.h"
 #include <map>
 #include <ctime>
+#include "StructAppInfo.h"
+#include <psapi.h>
+#include <cstring>
 
 class AppManagement {
     public:

@@ -7,7 +7,7 @@ Backend::Backend() {
     AppManagement::activateEventHandler();
 }
 
-std::map<char[], time_t> Backend::getOpenedWindows() {
+std::map<char*, StructAppInfo> Backend::getOpenedWindows() {
     return Backend::openedWindows;
 }
 

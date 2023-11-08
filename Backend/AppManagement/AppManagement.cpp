@@ -12,15 +12,16 @@ BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
             HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, lpdwProcessId);
             char fileName[MAX_PATH];
             DWORD sizeFileName = MAX_PATH;
-            QueryFullProcessImageName(hProcess, 0, fileName, &sizeFileName);
-            ((std::map<char[], time_t>)lParam)->insert({fileName, time(0)});
+            GetModuleFileNameEx(hProcess, nullptr, fileName, (DWORD) sizeFileName);
+            auto* openedWindows = reinterpret_cast<std::map<char*, StructAppInfo>*>(lParam);
+            openedWindows->insert({fileName, {time(0), 1}});
         }
     }
     return TRUE; // Continue l'énumération
 }
 
 void AppManagement::getActualRunnigApps() {
-    EnumWindows((WNDENUMPROC) EnumWindowsCallback, &(Backend::getInstance().openedWindows));
+    EnumWindows((WNDENUMPROC) EnumWindowsCallback, reinterpret_cast<LPARAM>(&Backend::getInstance().openedWindows));
 }
 
 // The callback function that will be called when a new window is created
@@ -33,7 +34,7 @@ void CALLBACK WinEventProc(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idOb
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, lpdwProcessId);
     char fileName[MAX_PATH];
     DWORD sizeFileName = MAX_PATH;
-    QueryFullProcessImageName(hProcess, 0, fileName, &sizeFileName);
+    GetModuleFileNameEx(hProcess, nullptr, fileName, (DWORD) sizeFileName);
 
     if (idObject == OBJID_WINDOW && event == EVENT_OBJECT_SHOW) {
         if (!(styles & WS_EX_TOOLWINDOW) && styles & WS_EX_APPWINDOW && styles & WS_VISIBLE) {

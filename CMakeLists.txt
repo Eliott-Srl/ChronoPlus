@@ -7,4 +7,5 @@ add_executable(ChronoPlus main.cpp
         Backend/Backend.cpp
         Backend/Backend.h
         Backend/AppManagement/AppManagement.cpp
-        Backend/AppManagement/AppManagement.h)
+        Backend/AppManagement/AppManagement.h
+)
