@@ -2,6 +2,12 @@
 
 BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam);
 
+void afficheStruct(std::map<char*, StructAppInfo> openedWindowsMap) {
+    for (auto i = (openedWindowsMap.end()); i != openedWindowsMap.end(); i++) {
+        std::cout << (*i).first << ": " << (*i).second.startTime << std::endl;
+    }
+}
+
 // Fonction de rappel pour EnumWindows
 BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
     if (IsWindowVisible(hwnd)) {
@@ -14,7 +20,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
             DWORD sizeFileName = MAX_PATH;
             GetModuleFileNameEx(hProcess, nullptr, fileName, (DWORD) sizeFileName);
             auto* openedWindows = reinterpret_cast<std::map<char*, StructAppInfo>*>(lParam);
-            openedWindows->insert({fileName, {time(0), 1}});
+            openedWindows->insert({fileName, {time(nullptr), 1}});
         }
     }
     return TRUE; // Continue l'énumération
@@ -38,17 +44,15 @@ void CALLBACK WinEventProc(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idOb
 
     if (idObject == OBJID_WINDOW && event == EVENT_OBJECT_SHOW) {
         if (!(styles & WS_EX_TOOLWINDOW) && styles & WS_EX_APPWINDOW && styles & WS_VISIBLE) {
-            system("Color 02");
             std::cout << "[ + ] ";
-            system("Color 0F");
             std::cout << title << " : " << fileName << std::endl;
+            afficheStruct(Backend::getInstance().getOpenedWindows());
         }
     } else if (idObject == OBJID_WINDOW && event == EVENT_OBJECT_HIDE) {
         if (!(styles & WS_EX_TOOLWINDOW) && styles & WS_EX_APPWINDOW) {
-            system("Color 04");
             std::cout << "[ - ] ";
-            system("Color 0F");
             std::cout << title << " : " << fileName << std::endl;
+            afficheStruct(Backend::getInstance().getOpenedWindows());
         }
     }
 }
