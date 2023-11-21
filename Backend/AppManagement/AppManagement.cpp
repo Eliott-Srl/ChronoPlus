@@ -2,14 +2,38 @@
 
 BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam);
 
-void afficheStruct(std::map<char*, StructAppInfo> openedWindowsMap) {
-    for (auto i = (openedWindowsMap.end()); i != openedWindowsMap.end(); i++) {
-        std::cout << (*i).first << ": " << (*i).second.startTime << std::endl;
+void AppManagement::addAppToMap(char* title, char* appPath, char* filename) {
+    if (std::strcmp(appPath, "") != 0 || std::strcmp(filename, "") != 0) {
+        return;
+    }
+
+    std::map<char*, StructAppInfo*> openedWindows = Backend::getInstance().openedWindows;
+
+    std::cout << "[ + ] " << title << " : " << filename << std::endl;
+
+    if (openedWindows.find(appPath) != openedWindows.end()) {
+        auto infos = openedWindows.at(appPath);
+        infos->appCopies++;
+    } else {
+        auto infos = (StructAppInfo*) malloc(sizeof(StructAppInfo));
+        if (infos) {
+            infos->appCopies = 1;
+            infos->startTime = time(nullptr);
+            openedWindows.insert({filename, infos});
+        } else {
+            std::cout << "It's not squared" << std::endl;
+        }
+    }
+}
+
+void afficheStruct(std::map<char*, StructAppInfo*> openedWindowsMap) {
+    for (auto i = openedWindowsMap.end(); i != openedWindowsMap.end(); i++) {
+        std::cout << (void*) (*i).first << ": " << (*i).second->startTime << std::endl;
     }
 }
 
 // Fonction de rappel pour EnumWindows
-BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
+BOOL CALLBACK EnumWindowsCallback(HWND hwnd) {
     if (IsWindowVisible(hwnd)) {
         DWORD styles = GetWindowLong(hwnd, GWL_STYLE);
         if (!(styles & WS_EX_TOOLWINDOW) && styles & WS_EX_APPWINDOW) {
@@ -19,15 +43,14 @@ BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
             char fileName[MAX_PATH];
             DWORD sizeFileName = MAX_PATH;
             GetModuleFileNameEx(hProcess, nullptr, fileName, (DWORD) sizeFileName);
-            auto* openedWindows = reinterpret_cast<std::map<char*, StructAppInfo>*>(lParam);
-            openedWindows->insert({fileName, {time(nullptr), 1}});
+
         }
     }
     return TRUE; // Continue l'énumération
 }
 
-void AppManagement::getActualRunnigApps() {
-    EnumWindows((WNDENUMPROC) EnumWindowsCallback, reinterpret_cast<LPARAM>(&Backend::getInstance().openedWindows));
+void AppManagement::getActualRunningApps() {
+    EnumWindows((WNDENUMPROC) EnumWindowsCallback, NULL);
 }
 
 // The callback function that will be called when a new window is created

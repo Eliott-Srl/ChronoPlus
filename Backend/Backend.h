@@ -13,7 +13,7 @@
 class Backend {
     public:
         static Backend& getInstance();
-        std::map<char*, StructAppInfo> getOpenedWindows();
+        std::map<char*, StructAppInfo*> getOpenedWindows();
 
     private:
         Backend& operator= (const Backend&);
@@ -22,7 +22,7 @@ class Backend {
         Backend();
         ~Backend();
 
-        std::map<char*, StructAppInfo> openedWindows;
+        std::map<char*, StructAppInfo*> openedWindows;
     friend class AppManagement;
 };
 

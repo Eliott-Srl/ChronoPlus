@@ -12,8 +12,9 @@
 
 class AppManagement {
     public:
-        static void getActualRunnigApps();
+        static void getActualRunningApps();
         static void activateEventHandler();
+        static void addAppToMap(char* title, char* appPath, char* filename);
 };
 
 

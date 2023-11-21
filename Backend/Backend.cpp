@@ -3,11 +3,11 @@
 Backend Backend::m_instance = Backend();
 
 Backend::Backend() {
-    AppManagement::getActualRunnigApps();
+    AppManagement::getActualRunningApps();
     AppManagement::activateEventHandler();
 }
 
-std::map<char*, StructAppInfo> Backend::getOpenedWindows() {
+std::map<char*, StructAppInfo*> Backend::getOpenedWindows() {
     return Backend::openedWindows;
 }
 
